@@ -35,4 +35,20 @@ export default class MotorcycleService {
 
     return this.createMotorcycleDomain(bike);
   }
+
+  async updateOne(id: string, data: IMotorcycle) {
+    if (!isValidObjectId(id)) {
+      throw new HttpException(HttpCode.UNPROCESSABLE_ENTITY, 'Invalid mongo id'); 
+    }
+
+    const bike = await this.motorcycleODM.findById(id);
+
+    if (!bike) throw new HttpException(HttpCode.NOT_FOUND, 'Motorcycle not found');
+
+    await this.motorcycleODM.updateOne(id, data);
+
+    const updatedBike = { id, ...data };
+
+    return this.createMotorcycleDomain(updatedBike);
+  }
 }

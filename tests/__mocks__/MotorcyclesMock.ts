@@ -21,6 +21,7 @@ export const validMotorcycleOutput: IMotorcycle = {
 };
 
 export const updatedMotorcycle: IMotorcycle = {
+  id: '634862336b35b59438fbea2d',
   model: 'Honda CG Titan 150',
   year: 2020,
   color: 'Black',

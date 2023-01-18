@@ -1,4 +1,4 @@
-import { Model, models, Schema, model } from 'mongoose';
+import { Model, models, Schema, model, UpdateQuery } from 'mongoose';
 
 export default abstract class AbstractODM<T> {
   protected model: Model<T>;
@@ -23,7 +23,11 @@ export default abstract class AbstractODM<T> {
     return this.model.findById(id);
   }
 
-  public async updateOne(id: string, data: T | null): Promise<void> {
-    await this.model.updateOne({ _id: id }, { $set: { ...data } });
+  public async updateOne(id: string, data: Partial<T>): Promise<void> {
+    await this.model.findByIdAndUpdate(
+      { _id: id },
+      { ...data } as UpdateQuery<T>,
+      { new: true },
+    );
   }
 }
