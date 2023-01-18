@@ -22,4 +22,8 @@ export default abstract class AbstractODM<T> {
   public async findById(id: string): Promise<T | null> {
     return this.model.findById(id);
   }
+
+  public async updateOne(id: string, data: T | null): Promise<void> {
+    await this.model.updateOne({ _id: id }, { $set: { ...data } });
+  }
 }
