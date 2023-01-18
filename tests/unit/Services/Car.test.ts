@@ -6,6 +6,8 @@ import ICar from '../../../src/Interfaces/ICar';
 import CarService from '../../../src/Services/CarService';
 import { carsArray, validCar, validCarOutput } from '../../__mocks__/CarsMock';
 
+const service = new CarService();
+
 describe('Car service', function () {
   it('should create a new car SUCCESSFULLY', async function () {
     // Arrange
@@ -16,7 +18,6 @@ describe('Car service', function () {
     Sinon.stub(Model, 'create').resolves(newCarOutput);
 
     // Act
-    const service = new CarService();
     const result = await service.create(newCarInput);
 
     // Assert
@@ -30,7 +31,6 @@ describe('Car service', function () {
     Sinon.stub(Model, 'find').resolves(carsList);
 
     // Act
-    const service = new CarService();
     const result = await service.findAll();
 
     // Assert
@@ -44,7 +44,6 @@ describe('Car service', function () {
     Sinon.stub(Model, 'findById').resolves(carOutput);
 
     // Act
-    const service = new CarService();
     const result = await service.findById('634852326b35b59438fbea2f');
 
     // Assert
@@ -57,11 +56,23 @@ describe('Car service', function () {
 
     // Act
     try {
-      const service = new CarService();
       await service.findById('invalid-id');
     } catch (err) {
       // Assert
       expect((err as Error).message).to.be.equal('Invalid mongo id');
+    }
+  });
+
+  it('should throw an exception by passing an wrong id', async function () {
+    // Arrange
+    Sinon.stub(Model, 'findById').resolves();
+
+    // Act
+    try {
+      await service.findById('644862346b36b59438fbea2d');
+    } catch (err) {
+      // Assert
+      expect((err as Error).message).to.be.equal('Car not found');
     }
   });
 

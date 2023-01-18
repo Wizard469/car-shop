@@ -10,6 +10,7 @@ export const validMotorcycle: IMotorcycle = {
 };
 
 export const validMotorcycleOutput: IMotorcycle = {
+  id: '634862336b35b59438fbea2d',
   model: 'Honda CG Titan 125',
   year: 1983,
   color: 'Red',
