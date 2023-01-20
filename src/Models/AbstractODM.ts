@@ -30,4 +30,8 @@ export default abstract class AbstractODM<T> {
       { new: true },
     );
   }
+
+  public async deleteOne(id: string): Promise<void> {
+    await this.model.findByIdAndDelete({ _id: id });
+  }
 }

@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { Model } from 'mongoose';
 import Sinon from 'sinon';
 import Motorcycle from '../../../src/Domains/Motorcycle';
-import IMotorcycle from '../../../src/Interfaces/IMotorcycle';
 import MotorcycleService from '../../../src/Services/MotorcycleService';
 import {
   motorcyclesArray,
@@ -14,110 +13,108 @@ import {
 const service = new MotorcycleService();
 
 describe('Motorcycle service', function () {
-  it('should create a new motorcycle SUCCESSFULLY', async function () {
-    // Arrange
-    const newBikeInput: IMotorcycle = validMotorcycle;
+  describe('Post route', function () {
+    it('should create a new motorcycle SUCCESSFULLY', async function () {
+      // Arrange
+      Sinon.stub(Model, 'create').resolves(new Motorcycle(validMotorcycleOutput));
 
-    const newBikeOutput: Motorcycle = new Motorcycle(validMotorcycleOutput);
+      // Act
+      const result = await service.create(validMotorcycle);
 
-    Sinon.stub(Model, 'create').resolves(newBikeOutput);
-
-    // Act
-    const result = await service.create(newBikeInput);
-
-    // Assert
-    expect(result).to.be.deep.equal(newBikeOutput);
-  });
-
-  it('should find all motorcycles', async function () {
-    // Arrange
-    const motorcycleList: IMotorcycle[] = motorcyclesArray;
-
-    Sinon.stub(Model, 'find').resolves(motorcycleList);
-
-    // Act
-    const result = await service.findAll();
-
-    // Assert
-    expect(result).to.be.deep.equal(motorcycleList);
-  });
-
-  it('should find motorcycle by id', async function () {
-    // Arrange
-    const bikeOutput: Motorcycle = new Motorcycle(validMotorcycleOutput);
-
-    Sinon.stub(Model, 'findById').resolves(bikeOutput);
-
-    // Act
-    const result = await service.findById('634862336b35b59438fbea2d');
-
-    // Assert
-    expect(result).to.be.deep.equal(bikeOutput);
-  });
-
-  it('should throw an exception by passing an invalid id format', async function () {
-    // Arrange
-    Sinon.stub(Model, 'findById').resolves({});
-
-    // Act
-    try {
-      await service.findById('invalid-id');
-    } catch (err) {
       // Assert
-      expect((err as Error).message).to.be.equal('Invalid mongo id');
-    }
+      expect(result).to.be.deep.equal(validMotorcycleOutput);
+      Sinon.restore();
+    });
   });
 
-  it('should throw an exception by passing an wrong id', async function () {
-    // Arrange
-    Sinon.stub(Model, 'findById').resolves();
+  describe('Get routes', function () {
+    it('should find all motorcycles', async function () {
+      // Arrange
+      Sinon.stub(Model, 'find').resolves(motorcyclesArray);
 
-    // Act
-    try {
-      await service.findById('644862346b36b59438fbea2d');
-    } catch (err) {
+      // Act
+      const result = await service.findAll();
+
       // Assert
-      expect((err as Error).message).to.be.equal('Motorcycle not found');
-    }
-  });
+      expect(result).to.be.deep.equal(motorcyclesArray);
+    });
 
-  it('should update a motorcycle SUCCESSFULLY', async function () {
-    // Arrange
-    Sinon.stub(Model, 'findById').resolves(validMotorcycleOutput);
-    Sinon.stub(Model, 'findByIdAndUpdate').resolves(updatedMotorcycle);
+    it('should find motorcycle by id', async function () {
+      // Arrange
+      Sinon.stub(Model, 'findById').resolves(new Motorcycle(validMotorcycleOutput));
 
-    // Act
-    const result = await service.updateOne('634862336b35b59438fbea2d', updatedMotorcycle);
+      // Act
+      const result = await service.findById('634862336b35b59438fbea2d');
 
-    // Assert
-    expect(result).to.be.deep.equal(updatedMotorcycle);
-  });
-
-  it('should throw an exception by trying to update with an invalid id format', async function () {
-    // Arrange
-    Sinon.stub(Model, 'findByIdAndUpdate').resolves();
-
-    // Act
-    try {
-      await service.updateOne('invalid-id', updatedMotorcycle);
-    } catch (err) {
       // Assert
-      expect((err as Error).message).to.be.equal('Invalid mongo id');
-    }
+      expect(result).to.be.deep.equal(validMotorcycleOutput);
+    });
+
+    it('should throw an exception by passing an invalid id format', async function () {
+      // Act
+      try {
+        await service.findById('invalid-id');
+      } catch (err) {
+        // Assert
+        expect((err as Error).message).to.be.equal('Invalid mongo id');
+      }
+    });
+
+    it('should throw an exception by passing an wrong id', async function () {
+      // Arrange
+      Sinon.stub(Model, 'findById').resolves();
+
+      // Act
+      try {
+        await service.findById('644862346b36b59438fbea2d');
+      } catch (err) {
+        // Assert
+        expect((err as Error).message).to.be.equal('Motorcycle not found');
+      }
+    });
+
+    afterEach(function () { Sinon.restore(); });
   });
 
-  it('should throw an exception by trying to update with a wrong id', async function () {
-    // Arrange
-    Sinon.stub(Model, 'findById').resolves();
+  describe('Put routes', function () {
+    it('should update a motorcycle SUCCESSFULLY', async function () {
+      // Arrange
+      Sinon.stub(Model, 'findById').resolves(validMotorcycleOutput);
+      Sinon.stub(Model, 'findByIdAndUpdate').resolves(updatedMotorcycle);
 
-    // Act
-    try {
-      await service.updateOne('634862236b34b59478fbea2d', updatedMotorcycle);
-    } catch (err) {
+      // Act
+      const result = await service.updateOne('634862336b35b59438fbea2d', updatedMotorcycle);
+
       // Assert
-      expect((err as Error).message).to.be.equal('Motorcycle not found');
-    }
-  });
+      expect(result).to.be.deep.equal(updatedMotorcycle);
+    });
 
-  afterEach(function () { Sinon.restore(); });
+    it(
+      'should throw an exception by trying to update with an invalid id format',
+      async function () {
+        // Act
+        try {
+          await service.updateOne('invalid-id', updatedMotorcycle);
+        } catch (err) {
+          // Assert
+          expect((err as Error).message).to.be.equal('Invalid mongo id');
+        }
+      },
+    );
+
+    it('should throw an exception by trying to update with a wrong id', async function () {
+      // Arrange
+      Sinon.stub(Model, 'findById').resolves();
+
+      // Act
+      try {
+        await service.updateOne('634862236b34b59478fbea2d', updatedMotorcycle);
+      } catch (err) {
+        // Assert
+        expect((err as Error).message).to.be.equal('Motorcycle not found');
+      }
+    });
+
+    afterEach(function () { Sinon.restore(); });
+  });
 });
